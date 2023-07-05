@@ -1,0 +1,83 @@
+# Lobby Spawn
+spawn-lobby:
+  x: 0.5
+  y: 67
+  z: 11.5
+  yaw: 180.0
+  pitch: 0.0
+  world: world
+
+# Messages
+messages:
+  join: "&6%player% &7joined!"
+  needed-players: "&62 &7Players are required to start the game."
+  block-break-forbidden: "&6You &7can't break blocks here!"
+  block-place-forbidden: "&6You &7can't place blocks here!"
+  no-permission: "&6You &7don't have the right permissions to use this command!"
+  build-mode-enabled: "&6BuildMode &7has been enabled!"
+  build-mode-disabled: "&6BuildMode &7has been disabled!"
+  build-mode-enabled-for-player: "&6BuildMode &7has been enabled for the player &6%player%&7!"
+  build-mode-disabled-for-player: "&6BuildMode &7has been enabled for the player &6%player%&7!"
+  couldnt-find-player: "&6Player &7couldn't be found!"
+  game-start: "&7The game is starting in &6%seconds%&7s!"
+  world-not-found: "&7The world &6%world%&7 couldn't be found!"
+  game-start-no-countdown: "&7The game is &6starting&7 now!"
+  teleporting: "&7Teleporting&6..."
+  player-death: "&6%player%&7 was killed by &6%cause%&7!"
+  invalid-game-id: "&7The game id &6%id%&7 is invalid!"
+  cant-find-game: "&6Game&7 couldn't be found!"
+  available-maps: "&7Available &6Maps&7:"
+  force-starting-game: "&7Starting game on map &6%map%&7..."
+
+# Maps
+maps:
+  # Map name needs to be same as world!
+  cavern:
+    spawn1:
+      x: 0.5
+      y: 63.0
+      z: 13.5
+      yaw: 180.0
+      pitch: 0.0
+    spawn2:
+      x: -9.5
+      y: 63.0
+      z: 10.5
+      yaw: -135.5
+      pitch: 0.0
+    spawn3:
+      x: -12.5
+      y: 63.0
+      z: 0.5
+      yaw: -90.0
+      pitch: 0.0
+    spawn4:
+      x: -9.5
+      y: 63.0
+      z: -9.5
+      yaw: -45
+      pitch: 0.0
+    spawn5:
+      x: 0.5
+      y: 63.0
+      z: -12.5
+      yaw: 0.0
+      pitch: 0.0
+    spawn6:
+      x: 10.5
+      y: 63.0
+      z: -9.5
+      yaw: 45.0
+      pitch: 0.0
+    spawn7:
+      x: 13.5
+      y: 63.0
+      z: 0.5
+      yaw: 90.0
+      pitch: 0.0
+    spawn8:
+      x: 10.5
+      y: 63.0
+      z: 10.5
+      yaw: 135.0
+      pitch: 0

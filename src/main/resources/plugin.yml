@@ -1,0 +1,18 @@
+name: PS3Minigames
+version: '${project.version}'
+main: me.firephoenix.ps3minigames.PS3Minigames
+author: NieGestorben
+
+commands:
+  build:
+    permission: ps3minigames.command.buildmode
+    usage: §7/build <PLAYER>
+  forcestart:
+    permission: ps3minigames.command.forcestart
+    usage: §7/forcestart <MAP>
+  forcestop:
+    permission: ps3minigames.command.forcestop
+    usage: §7/forcestop <GAMEID>
+  maplist:
+    permission: ps3minigames.command.maplist
+    usage: §7/maplist
