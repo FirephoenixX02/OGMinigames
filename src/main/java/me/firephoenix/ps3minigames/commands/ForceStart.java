@@ -29,7 +29,7 @@ public class ForceStart implements CommandExecutor {
             if (world != null) {
                 ArrayList<UUID> players = new ArrayList<>();
                 PS3Minigames.INSTANCE.getLobby().getPlayers().forEach(player -> players.add(player.getUniqueId()));
-                PS3Minigames.INSTANCE.startNewGame(players, world);
+                PS3Minigames.INSTANCE.getGameUtil().startNewGame(players, world);
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.force-starting-game").replace("%map%", world.getName())));
                 return true;
             } else {

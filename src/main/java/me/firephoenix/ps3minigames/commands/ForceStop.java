@@ -28,11 +28,11 @@ public class ForceStop implements CommandExecutor {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.invalid-game-id").replace("%id%", args[0])));
                 return false;
             }
-            if (PS3Minigames.INSTANCE.getGameByID(gameID) == null || gameID == 0) {
+            if (PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID) == null || gameID == 0) {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.cant-find-game")));
                 return true;
             } else {
-                PS3Minigames.INSTANCE.stopGame(Objects.requireNonNull(PS3Minigames.INSTANCE.getGameByID(gameID)));
+                PS3Minigames.INSTANCE.getGameUtil().stopGame(Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID)));
                 return true;
             }
         }

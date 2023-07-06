@@ -2,6 +2,7 @@ package me.firephoenix.ps3minigames.listener;
 
 import me.firephoenix.ps3minigames.PS3Minigames;
 import me.firephoenix.ps3minigames.states.LobbyState;
+import me.firephoenix.ps3minigames.util.GameUtil;
 import me.firephoenix.ps3minigames.util.Timer;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -70,7 +71,7 @@ public class JoinQuitListener implements Listener {
 
                 gameTimer.start();
                 gameTimer = new Timer(plugin.getLobby().getPlayers().size() >= 3 ? 10 : 25, plugin);
-                gameTimer.whenComplete(() -> PS3Minigames.INSTANCE.startNewGame(lobbyPlayers, plugin.getServer().getWorld("cavern")));
+                gameTimer.whenComplete(() -> PS3Minigames.INSTANCE.getGameUtil().startNewGame(lobbyPlayers, plugin.getServer().getWorld("cavern")));
             }
         }
     }

@@ -8,6 +8,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
+import java.util.Objects;
+
 /**
  * @author NieGestorben
  * Copyright© (c) 2023, All Rights Reserved.
@@ -23,7 +25,7 @@ public class DeathListener implements Listener {
 
         player.getWorld().getPlayers().forEach(players -> players.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.player-death").replace("%player%", player.getDisplayName()).replace("%cause%", killer == null ? "enviroment" : killer.getDisplayName()))));
         if (player.getWorld().getPlayers().size() == 1) {
-            PS3Minigames.INSTANCE.stopGame(PS3Minigames.INSTANCE.getGameByWorld(player.getWorld()));
+            PS3Minigames.INSTANCE.getGameUtil().stopGame(Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByWorld(player.getWorld())));
         }
     }
 }
