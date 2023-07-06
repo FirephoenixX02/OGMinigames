@@ -45,6 +45,8 @@ public final class PS3Minigames extends JavaPlugin {
 
     public MultiverseCore multiverseCore;
 
+    public ArrayList<UUID> frozenPlayer = new ArrayList<>();
+
     @Override
     public void onEnable() {
         // Set Instance
@@ -94,6 +96,7 @@ public final class PS3Minigames extends JavaPlugin {
                     Location location = new Location(gameWorld, getConfig().getDouble(configpathtospawnloc + ".x"), getConfig().getDouble(configpathtospawnloc + ".y"), getConfig().getDouble(configpathtospawnloc + ".z"), (float) getConfig().getDouble(configpathtospawnloc + ".yaw"), (float) getConfig().getDouble(configpathtospawnloc + ".pitch"));
                     System.out.println(configpathtospawnloc + ".x");
                     Bukkit.getServer().getPlayer(uuid).teleport(location);
+                    getFrozenPlayer().add(uuid);
                 }
                 Timer timer = new Timer(10, PS3Minigames.INSTANCE);
                 timer.start();
@@ -105,7 +108,10 @@ public final class PS3Minigames extends JavaPlugin {
                 });
                 timer.whenComplete(() -> {
                     newGame.setGameState(GameState.RUNNING);
-                    gameWorld.getPlayers().forEach(player -> player.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.game-start-no-countdown"))));
+                    gameWorld.getPlayers().forEach(player -> {
+                        frozenPlayer.remove(player.getUniqueId());
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.game-start-no-countdown")));
+                    });
                 });
             } else {
                 System.out.println("error while trying to load the world!");
