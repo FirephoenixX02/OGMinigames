@@ -103,6 +103,13 @@ chest-loot:
   - WOOD_AXE#1
   - GOLD_HELMET#1
   - LEATHER_CHESTPLATE#1
+  - GOLDEN_APPLE#1
+  - IRON_BOOTS#1
+  - IRON_CHESTPLATE#1
+  - GOLD_CHESTPLATE#1
+  - DIAMOND_PICKAXE#1
+  - LEATHER_HELMET#1
+  - IRON_HELMET#1
 # Chest Loot Potions
 # Note: Only <=1.8 Items !
 # https://dev.bukkit.org/projects/etshop/pages/potion-data-value-table OR https://minecraftitemids.com/types/potion

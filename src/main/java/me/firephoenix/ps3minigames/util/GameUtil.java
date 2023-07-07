@@ -120,7 +120,7 @@ public class GameUtil {
             int randomSlot = getRandomInRange(0, slots);
             Random random = new Random();
             int chance = random.nextInt(10);
-            boolean potion = chance >= 1 && chance < 3;
+            boolean potion = (chance == 1 || chance == 2);
             if (potion) {
                 ItemStack[] possiblePotions = getPossiblePotionsFromConfig("chest-loot-potions").toArray(new ItemStack[0]);
                 ItemStack randomPotion = possiblePotions[random.nextInt((int) Arrays.stream(possiblePotions).count())];
