@@ -8,9 +8,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -54,17 +52,23 @@ public class WorldListener implements Listener {
 
     @EventHandler
     public void onDestroyCrops(PlayerInteractEvent e) {
-        if (e.getClickedBlock() == null) {
-            e.setCancelled(true);
-            return;
-        }
-        if (e.getClickedBlock().getType() == Material.AIR) {
-            e.setCancelled(true);
-            return;
+        if (e.getClickedBlock() != null) {
+            if (e.getClickedBlock().getType() == Material.AIR) {
+                e.setCancelled(true);
+                return;
+            }
         }
         if (!PS3Minigames.INSTANCE.getBuildModePlayer().contains(e.getPlayer().getUniqueId())) {
-            if (e.getPlayer().getWorld() != PS3Minigames.INSTANCE.getLobby() && e.getClickedBlock().getType() == Material.CHEST) return;
-            e.setCancelled(true);
+            if (e.getClickedBlock() == null) return;
+            Block clickedBlock = e.getClickedBlock();
+
+            //Left or Right click?
+            if (e.getAction() == Action.LEFT_CLICK_BLOCK) {
+                //Crops?
+                if (clickedBlock.getType() == Material.CROPS) {
+                    e.setCancelled(true);
+                }
+            }
         }
     }
 
@@ -89,15 +93,14 @@ public class WorldListener implements Listener {
 
     @EventHandler
     public void onPlayerDoorOpen(PlayerInteractEvent e) {
-        if (e.getClickedBlock() == null) {
-            e.setCancelled(true);
-            return;
-        }
-        if (e.getClickedBlock().getType() == Material.AIR) {
-            e.setCancelled(true);
-            return;
+        if (e.getClickedBlock() != null) {
+            if (e.getClickedBlock().getType() == Material.AIR) {
+                e.setCancelled(true);
+                return;
+            }
         }
         if (!PS3Minigames.INSTANCE.getBuildModePlayer().contains(e.getPlayer().getUniqueId())) {
+            if (e.getClickedBlock() == null) return;
             Block clickedBlock = e.getClickedBlock();
 
             //Left or Right click?
@@ -153,6 +156,16 @@ public class WorldListener implements Listener {
                 if (!(player.getFoodLevel() == 20)) player.setFoodLevel(20);
             }
         }
+    }
+
+    @EventHandler
+    public void onBlockSpread(BlockSpreadEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onBlockGrowth(BlockGrowEvent e) {
+        e.setCancelled(true);
     }
 
 }

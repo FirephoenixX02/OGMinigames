@@ -1,6 +1,7 @@
 package me.firephoenix.ps3minigames.commands;
 
 import me.firephoenix.ps3minigames.PS3Minigames;
+import me.firephoenix.ps3minigames.states.GameState;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -32,6 +33,10 @@ public class ForceStop implements CommandExecutor {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.cant-find-game")));
                 return true;
             } else {
+                if (Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID)).getGameState() != GameState.RUNNING) {
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.cant-stop-game")));
+                }
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.force-stopping-game").replace("%map%", Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID)).getMap().getName())));
                 PS3Minigames.INSTANCE.getGameUtil().stopGame(Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID)));
                 return true;
             }

@@ -28,6 +28,8 @@ messages:
   cant-find-game: "&6Game&7 couldn't be found!"
   available-maps: "&7Available &6Maps&7:"
   force-starting-game: "&7Starting game on map &6%map%&7..."
+  force-stopping-game: "&7Stopping game on map &6%map%&7..."
+  cant-stop-game: "&7Cant stop game because it's already &6stopping&7!"
 
 # Maps
 maps:
@@ -81,3 +83,37 @@ maps:
       z: 10.5
       yaw: 135.0
       pitch: 0.0
+
+# Chest Loot
+# Item list ---> https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+# Note: Only <=1.8 Items !
+# BukkitMaterial#Amount
+chest-loot:
+  - STONE_SWORD#1
+  - APPLE#1
+  - COOKED_MUTTON#1
+  - WOOD_SWORD#1
+  - CHAINMAIL_HELMET#1
+  - CHAINMAIL_CHESTPLATE#1
+  - LEATHER_LEGGINGS#1
+  - WOOD_PICKAXE#1
+  - BOW#1
+  - ARROW#5
+  - LEATHER_BOOTS#1
+  - WOOD_AXE#1
+  - GOLD_HELMET#1
+  - LEATHER_CHESTPLATE#1
+# Chest Loot Potions
+# Note: Only <=1.8 Items !
+# https://dev.bukkit.org/projects/etshop/pages/potion-data-value-table OR https://minecraftitemids.com/types/potion
+# Usage: POTION_DATA_VALUE
+chest-loot-potions:
+  - 8193 # Regen
+  - 8197 # Instant Heal
+  - 16396 # Harming Splash
+  - 16388 # Poison Splash
+  - 8194 # Speed I
+  - 16392 # Weakness Splash
+  - 8195 # Fire Res
+
+
