@@ -86,6 +86,10 @@ public class GameUtil {
             Bukkit.getServer().getPlayer(uuid).getActivePotionEffects().clear();
             Bukkit.getServer().getPlayer(uuid).setHealth(20);
             Bukkit.getServer().getPlayer(uuid).setFoodLevel(20);
+            Bukkit.getServer().getPlayer(uuid).getInventory().setBoots(null);
+            Bukkit.getServer().getPlayer(uuid).getInventory().setLeggings(null);
+            Bukkit.getServer().getPlayer(uuid).getInventory().setChestplate(null);
+            Bukkit.getServer().getPlayer(uuid).getInventory().setHelmet(null);
             PS3Minigames.INSTANCE.getFrozenPlayer().remove(uuid);
         });
         if (game.getMap().getPlayers().size() == 0) {

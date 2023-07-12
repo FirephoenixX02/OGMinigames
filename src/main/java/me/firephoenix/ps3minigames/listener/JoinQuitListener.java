@@ -4,10 +4,7 @@ import me.firephoenix.ps3minigames.PS3Minigames;
 import me.firephoenix.ps3minigames.states.LobbyState;
 import me.firephoenix.ps3minigames.util.GameUtil;
 import me.firephoenix.ps3minigames.util.Timer;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +36,10 @@ public class JoinQuitListener implements Listener {
         player.setHealth(20);
         player.setFoodLevel(20);
         player.getInventory().clear();
+        player.getInventory().setBoots(null);
+        player.getInventory().setLeggings(null);
+        player.getInventory().setChestplate(null);
+        player.getInventory().setHelmet(null);
         player.setGameMode(GameMode.SURVIVAL);
 
         // Send all players which are in the lobby the join message
