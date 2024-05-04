@@ -1,6 +1,7 @@
 package me.firephoenix.ps3minigames.listener;
 
 import me.firephoenix.ps3minigames.PS3Minigames;
+import me.firephoenix.ps3minigames.game.Game;
 import me.firephoenix.ps3minigames.states.LobbyState;
 import me.firephoenix.ps3minigames.util.GameUtil;
 import me.firephoenix.ps3minigames.util.Timer;
@@ -13,6 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -79,7 +81,13 @@ public class JoinQuitListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
+        Game game = PS3Minigames.INSTANCE.getGameUtil().getGameByWorld(e.getPlayer().getWorld());
+        if (game != null) {
+            game.getPlayers().remove(e.getPlayer().getUniqueId());
+            if (game.getPlayers().size() <= 1) {
+                PS3Minigames.INSTANCE.getGameUtil().stopGame(game);
+            }
+        }
         lobbyPlayers.remove(e.getPlayer().getUniqueId());
     }
-
 }

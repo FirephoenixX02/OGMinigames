@@ -30,6 +30,7 @@ messages:
   force-starting-game: "&7Starting game on map &6%map%&7..."
   force-stopping-game: "&7Stopping game on map &6%map%&7..."
   cant-stop-game: "&7Cant stop game because it's already &6stopping&7!"
+  game-won: "%winner% &7won the game!"
 
 # Maps
 maps:

@@ -5,6 +5,7 @@ import me.firephoenix.ps3minigames.game.Game;
 import me.firephoenix.ps3minigames.states.GameState;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,6 +78,10 @@ public class GameUtil {
         if (game.getGameState() == GameState.STOPPING) {
             System.out.println("Someone tried to stop a game which is currently stopping, not possible, ignoring.");
             return;
+        }
+        if (Bukkit.getServer().getPlayer(game.getPlayers().get(0)) != null) {
+            Player winner = Bukkit.getPlayer(game.getPlayers().get(0));
+            game.getPlayers().forEach(uuid -> Bukkit.getServer().getPlayer(uuid).sendMessage(ChatColor.translateAlternateColorCodes('&', PS3Minigames.INSTANCE.getConfig().getString("messages.game-won").replace("%winner%", winner.getDisplayName()))));
         }
         game.setGameState(GameState.STOPPING);
         // Teleport all players + Clear inv + Reset Effects + Unfreeze
