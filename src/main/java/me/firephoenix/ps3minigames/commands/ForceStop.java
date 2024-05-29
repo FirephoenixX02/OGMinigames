@@ -33,11 +33,13 @@ public class ForceStop implements CommandExecutor {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.cant-find-game")));
                 return true;
             } else {
-                if (Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID)).getGameState() != GameState.RUNNING) {
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.cant-stop-game")));
+                GameState state = PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID).getGameState();
+                if (state == GameState.INVINCIBILITY || state == GameState.RUNNING) {
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.force-stopping-game").replace("%map%", Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID)).getMap().getName())));
+                    PS3Minigames.INSTANCE.getGameUtil().stopGame(Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID)));
+                    return true;
                 }
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.force-stopping-game").replace("%map%", Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID)).getMap().getName())));
-                PS3Minigames.INSTANCE.getGameUtil().stopGame(Objects.requireNonNull(PS3Minigames.INSTANCE.getGameUtil().getGameByID(gameID)));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.cant-stop-game")));
                 return true;
             }
         }

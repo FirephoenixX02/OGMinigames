@@ -13,16 +13,11 @@ import me.firephoenix.ps3minigames.listener.DeathListener;
 import me.firephoenix.ps3minigames.listener.JoinQuitListener;
 import me.firephoenix.ps3minigames.listener.MoveListener;
 import me.firephoenix.ps3minigames.listener.WorldListener;
-import me.firephoenix.ps3minigames.states.GameState;
 import me.firephoenix.ps3minigames.states.LobbyState;
 import me.firephoenix.ps3minigames.util.GameUtil;
-import me.firephoenix.ps3minigames.util.Timer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -5,7 +5,9 @@ import me.firephoenix.ps3minigames.game.Game;
 import me.firephoenix.ps3minigames.states.LobbyState;
 import me.firephoenix.ps3minigames.util.GameUtil;
 import me.firephoenix.ps3minigames.util.Timer;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +16,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -34,46 +35,50 @@ public class JoinQuitListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        player.teleport(new Location(plugin.getServer().getWorld(config.getString("spawn-lobby.world")), config.getDouble("spawn-lobby.x"), config.getDouble("spawn-lobby.y"), config.getDouble("spawn-lobby.z"), (float) config.getDouble("spawn-lobby.yaw"), (float) config.getDouble("spawn-lobby.pitch")));
-        player.setHealth(20);
-        player.setFoodLevel(20);
-        player.getInventory().clear();
-        player.getInventory().setBoots(null);
-        player.getInventory().setLeggings(null);
-        player.getInventory().setChestplate(null);
-        player.getInventory().setHelmet(null);
-        player.setGameMode(GameMode.SURVIVAL);
 
-        // Send all players which are in the lobby the join message
+        player.teleport(new Location(
+                plugin.getServer().getWorld(config.getString("spawn-lobby.world")),
+                config.getDouble("spawn-lobby.x"),
+                config.getDouble("spawn-lobby.y"),
+                config.getDouble("spawn-lobby.z"),
+                (float) config.getDouble("spawn-lobby.yaw"),
+                (float) config.getDouble("spawn-lobby.pitch")
+        ));
+
+        GameUtil.resetInventory(player);
+
+        // Send all players in the lobby the join message
+        String joinMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.join").replace("%player%", player.getDisplayName()));
         for (Player player1 : plugin.getLobby().getPlayers()) {
-            player1.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.join").replace("%player%", player.getDisplayName())));
+            player1.sendMessage(joinMessage);
         }
-        // Send joined player the join message, because joinevent is 1 tick before the player gets added to the world player list
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.join").replace("%player%", player.getDisplayName())));
-        if (plugin.getLobby().getPlayers().size() == 0) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.needed-players")));
+        player.sendMessage(joinMessage);
+
+        int lobbySize = plugin.getLobby().getPlayers().size();
+
+        if (lobbySize == 0) {
+            String neededPlayersMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.needed-players"));
+            player.sendMessage(neededPlayersMessage);
             for (Player player1 : plugin.getLobby().getPlayers()) {
-                player1.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.needed-players")));
+                player1.sendMessage(neededPlayersMessage);
             }
         } else {
-            if (plugin.getLobby().getPlayers().size() >= 3) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.game-start").replace("%seconds%", "10")));
-                for (Player player1 : plugin.getLobby().getPlayers()) {
-                    player1.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.game-start").replace("%seconds%", "10")));
-                }
-            } else {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.game-start").replace("%seconds%", "25")));
-                for (Player player1 : plugin.getLobby().getPlayers()) {
-                    player1.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.game-start").replace("%seconds%", "25")));
-                }
+            String gameStartMessage;
+            int startSeconds = (lobbySize >= 3) ? 10 : 25;
+            gameStartMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.game-start").replace("%seconds%", Integer.toString(startSeconds)));
+
+            player.sendMessage(gameStartMessage);
+            for (Player player1 : plugin.getLobby().getPlayers()) {
+                player1.sendMessage(gameStartMessage);
             }
+
             if (plugin.getLobbyState() == LobbyState.IDLE) {
                 plugin.setLobbyState(LobbyState.STARTING);
                 lobbyPlayers.add(player.getUniqueId());
                 plugin.getLobby().getPlayers().forEach(player1 -> lobbyPlayers.add(player1.getUniqueId()));
 
                 gameTimer.start();
-                gameTimer = new Timer(plugin.getLobby().getPlayers().size() >= 3 ? 10 : 25, plugin);
+                gameTimer = new Timer(startSeconds, plugin);
                 gameTimer.whenComplete(() -> PS3Minigames.INSTANCE.getGameUtil().startNewGame(lobbyPlayers, plugin.getServer().getWorld("cavern")));
             }
         }

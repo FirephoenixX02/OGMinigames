@@ -1,5 +1,8 @@
 package me.firephoenix.ps3minigames.util;
 
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import me.firephoenix.ps3minigames.PS3Minigames;
 import me.firephoenix.ps3minigames.game.Game;
 import me.firephoenix.ps3minigames.states.GameState;
@@ -19,59 +22,55 @@ import java.util.*;
  */
 public class GameUtil {
 
-
-    public static int getRandomInRange(int min, int max) {
-        Random random = new Random();
-        return random.nextInt(max - min) + min;
-    }
-
-    public static float getRandomInRange(float min, float max) {
-        return (float) (min + Math.random() * (max - min));
-    }
-
     public void startNewGame(ArrayList<UUID> players, World map) {
-        int ID = PS3Minigames.INSTANCE.getGames().size() + 1;
-        String newName = map.getName() + "game" + ID;
-        boolean copydone = PS3Minigames.INSTANCE.getMultiverseCore().getMVWorldManager().cloneWorld(map.getName(), newName);
-        if (copydone) {
-            boolean loadingdone = PS3Minigames.INSTANCE.getMultiverseCore().getMVWorldManager().loadWorld(newName);
-            if (loadingdone) {
-                PS3Minigames.INSTANCE.getMultiverseCore().getMVWorldManager().getMVWorld(newName).setAlias(newName);
-                World gameWorld = Bukkit.getWorld(newName);
-                Game newGame = new Game(ID, players, gameWorld, GameState.STARTING);
-                PS3Minigames.INSTANCE.getGames().add(newGame);
-                PS3Minigames.INSTANCE.getWorldToGameHashMap().put(gameWorld, newGame);
-                int spawnnumber = 1;
-                for (UUID uuid : players) {
-                    if (PS3Minigames.INSTANCE.getServer().getPlayer(uuid) == null) return;
-                    PS3Minigames.INSTANCE.getServer().getPlayer(uuid).sendMessage(ChatColor.translateAlternateColorCodes('&', PS3Minigames.INSTANCE.getConfig().getString("messages.teleporting")));
-                    String configpathtospawnloc = "maps." + map.getName() + ".spawn" + spawnnumber++;
-                    Location location = new Location(gameWorld, PS3Minigames.INSTANCE.getConfig().getDouble(configpathtospawnloc + ".x"), PS3Minigames.INSTANCE.getConfig().getDouble(configpathtospawnloc + ".y"), PS3Minigames.INSTANCE.getConfig().getDouble(configpathtospawnloc + ".z"), (float) PS3Minigames.INSTANCE.getConfig().getDouble(configpathtospawnloc + ".yaw"), (float) PS3Minigames.INSTANCE.getConfig().getDouble(configpathtospawnloc + ".pitch"));
-                    Bukkit.getServer().getPlayer(uuid).teleport(location);
-                    PS3Minigames.INSTANCE.getFrozenPlayer().add(uuid);
-                }
-                Timer timer = new Timer(10, PS3Minigames.INSTANCE);
-                timer.start();
-                fillChests(newGame);
-                timer.eachSecond(() -> {
-                    for (UUID uuid : newGame.getPlayers()) {
-                        if (Bukkit.getServer().getPlayer(uuid) == null) return;
-                        Bukkit.getServer().getPlayer(uuid).sendTitle(ChatColor.translateAlternateColorCodes('&', "&6" + timer.getCounter()), "");
-                    }
-                });
-                timer.whenComplete(() -> {
-                    newGame.setGameState(GameState.RUNNING);
-                    gameWorld.getPlayers().forEach(player -> {
-                        PS3Minigames.INSTANCE.getFrozenPlayer().remove(player.getUniqueId());
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', PS3Minigames.INSTANCE.getConfig().getString("messages.game-start-no-countdown")));
-                    });
-                });
-            } else {
-                System.out.println("error while trying to load the world!");
-            }
-        } else {
-            System.out.println("error while trying to copy the world!");
+        PS3Minigames plugin = PS3Minigames.INSTANCE;
+        MultiverseCore mvCore = plugin.getMultiverseCore();
+        MVWorldManager worldManager = mvCore.getMVWorldManager();
+
+        int gameId = plugin.getGames().size() + 1;
+        String newWorldName = map.getName() + "game" + gameId;
+
+        if (!worldManager.cloneWorld(map.getName(), newWorldName)) {
+            System.out.println("Error while trying to copy the world!");
+            return;
         }
+
+        if (!worldManager.loadWorld(newWorldName)) {
+            System.out.println("Error while trying to load the world!");
+            return;
+        }
+
+        MultiverseWorld mvWorld = worldManager.getMVWorld(newWorldName);
+        mvWorld.setAlias(newWorldName);
+        World gameWorld = Bukkit.getWorld(newWorldName);
+
+        Game newGame = new Game(gameId, players, gameWorld, GameState.STARTING);
+        plugin.getGames().add(newGame);
+        plugin.getWorldToGameHashMap().put(gameWorld, newGame);
+
+        int spawnNumber = 1;
+        for (UUID uuid : players) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) return;
+
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.teleporting")));
+
+            String spawnPath = "maps." + map.getName() + ".spawn" + spawnNumber++;
+            Location spawnLocation = new Location(
+                    gameWorld,
+                    plugin.getConfig().getDouble(spawnPath + ".x"),
+                    plugin.getConfig().getDouble(spawnPath + ".y"),
+                    plugin.getConfig().getDouble(spawnPath + ".z"),
+                    (float) plugin.getConfig().getDouble(spawnPath + ".yaw"),
+                    (float) plugin.getConfig().getDouble(spawnPath + ".pitch")
+            );
+
+            player.teleport(spawnLocation);
+            plugin.getFrozenPlayer().add(uuid);
+        }
+
+        startCountdown(newGame, 10, "&6");
+        startInvincibilityTimer(newGame, 25, "&6Invulnerability wears off in ");
     }
 
     public void stopGame(Game game) {
@@ -79,27 +78,45 @@ public class GameUtil {
             System.out.println("Someone tried to stop a game which is currently stopping, not possible, ignoring.");
             return;
         }
-        if (Bukkit.getServer().getPlayer(game.getPlayers().get(0)) != null) {
-            Player winner = Bukkit.getPlayer(game.getPlayers().get(0));
-            game.getPlayers().forEach(uuid -> Bukkit.getServer().getPlayer(uuid).sendMessage(ChatColor.translateAlternateColorCodes('&', PS3Minigames.INSTANCE.getConfig().getString("messages.game-won").replace("%winner%", winner.getDisplayName()))));
+
+        List<UUID> players = game.getPlayers();
+        Player winner = Bukkit.getPlayer(players.get(0));
+
+        if (winner != null) {
+            String gameWonMessage = ChatColor.translateAlternateColorCodes('&',
+                    PS3Minigames.INSTANCE.getConfig().getString("messages.game-won").replace("%winner%", winner.getDisplayName()));
+
+            for (UUID uuid : players) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null) {
+                    player.sendMessage(gameWonMessage);
+                }
+            }
         }
+
         game.setGameState(GameState.STOPPING);
-        // Teleport all players + Clear inv + Reset Effects + Unfreeze
-        game.getPlayers().forEach(uuid -> {
-            Bukkit.getServer().getPlayer(uuid).teleport(new Location(PS3Minigames.INSTANCE.getServer().getWorld(PS3Minigames.INSTANCE.getConfig().getString("spawn-lobby.world")), PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.x"), PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.y"), PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.z"), (float) PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.yaw"), (float) PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.pitch")));
-            Bukkit.getServer().getPlayer(uuid).getInventory().clear();
-            Bukkit.getServer().getPlayer(uuid).getActivePotionEffects().clear();
-            Bukkit.getServer().getPlayer(uuid).setHealth(20);
-            Bukkit.getServer().getPlayer(uuid).setFoodLevel(20);
-            Bukkit.getServer().getPlayer(uuid).getInventory().setBoots(null);
-            Bukkit.getServer().getPlayer(uuid).getInventory().setLeggings(null);
-            Bukkit.getServer().getPlayer(uuid).getInventory().setChestplate(null);
-            Bukkit.getServer().getPlayer(uuid).getInventory().setHelmet(null);
-            PS3Minigames.INSTANCE.getFrozenPlayer().remove(uuid);
-        });
-        if (game.getMap().getPlayers().size() == 0) {
+
+        Location spawnLocation = new Location(
+                PS3Minigames.INSTANCE.getServer().getWorld(PS3Minigames.INSTANCE.getConfig().getString("spawn-lobby.world")),
+                PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.x"),
+                PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.y"),
+                PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.z"),
+                (float) PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.yaw"),
+                (float) PS3Minigames.INSTANCE.getConfig().getDouble("spawn-lobby.pitch")
+        );
+
+        for (UUID uuid : players) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                player.teleport(spawnLocation);
+                resetInventory(player);
+            }
+        }
+
+        if (game.getMap().getPlayers().isEmpty()) {
             PS3Minigames.INSTANCE.getMultiverseCore().getMVWorldManager().deleteWorld(game.getMap().getName());
         }
+
         PS3Minigames.INSTANCE.getGames().remove(game);
     }
 
@@ -189,6 +206,67 @@ public class GameUtil {
         BigDecimal bd = new BigDecimal(Double.toString(value));
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    private void startCountdown(Game game, int seconds, String titleColor) {
+        Timer timer = new Timer(seconds, PS3Minigames.INSTANCE);
+        timer.start();
+
+        timer.eachSecond(() -> {
+            for (UUID uuid : game.getPlayers()) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) return;
+                player.sendTitle(ChatColor.translateAlternateColorCodes('&', titleColor + timer.getCounter()), "");
+            }
+        });
+
+        timer.whenComplete(() -> {
+            game.setGameState(GameState.INVINCIBILITY);
+            game.getMap().getPlayers().forEach(player -> {
+                PS3Minigames.INSTANCE.getFrozenPlayer().remove(player.getUniqueId());
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', PS3Minigames.INSTANCE.getConfig().getString("messages.game-start-no-countdown")));
+            });
+        });
+
+        fillChests(game);
+    }
+
+    private void startInvincibilityTimer(Game game, int seconds, String messagePrefix) {
+        Timer invincibilityTimer = new Timer(seconds, PS3Minigames.INSTANCE);
+        invincibilityTimer.start();
+
+        invincibilityTimer.eachSecond(() -> {
+            for (UUID uuid : game.getPlayers()) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) return;
+                player.sendTitle("", ChatColor.translateAlternateColorCodes('&', messagePrefix + invincibilityTimer.getCounter()));
+            }
+        });
+
+        invincibilityTimer.whenComplete(() -> {
+            game.setGameState(GameState.RUNNING);
+        });
+    }
+
+    public static int getRandomInRange(int min, int max) {
+        Random random = new Random();
+        return random.nextInt(max - min) + min;
+    }
+
+    public static float getRandomInRange(float min, float max) {
+        return (float) (min + Math.random() * (max - min));
+    }
+
+    public static void resetInventory(Player player) {
+        player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
+        player.setHealth(20);
+        player.setFoodLevel(20);
+        player.getInventory().clear();
+        player.getInventory().setBoots(null);
+        player.getInventory().setLeggings(null);
+        player.getInventory().setChestplate(null);
+        player.getInventory().setHelmet(null);
+        player.setGameMode(GameMode.SURVIVAL);
     }
 
 }

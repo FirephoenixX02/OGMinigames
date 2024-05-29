@@ -8,5 +8,6 @@ public enum GameState {
 
     STARTING,
     RUNNING,
+    INVINCIBILITY,
     STOPPING
 }

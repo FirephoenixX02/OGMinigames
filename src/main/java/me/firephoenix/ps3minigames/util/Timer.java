@@ -1,5 +1,6 @@
 package me.firephoenix.ps3minigames.util;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -12,6 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class Timer {
     private final int duration;
     private final Plugin plugin;
+    @Getter
     int counter;
     BukkitTask bukkitTask;
     private boolean running = false;
@@ -63,7 +65,4 @@ public class Timer {
         return running;
     }
 
-    public int getCounter() {
-        return counter;
-    }
 }
