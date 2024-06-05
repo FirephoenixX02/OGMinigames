@@ -22,7 +22,7 @@ public class MapList implements CommandExecutor {
  public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
   if (args.length == 0) {
    StringBuilder sb = new StringBuilder();
-   PS3Minigames.INSTANCE.getMultiverseCore().getMVWorldManager().getMVWorlds().stream().filter(world -> !world.getName().contains("world")).forEach(world -> sb.append(world.getName()).append(", "));
+   PS3Minigames.INSTANCE.getMultiverseCore().getMVWorldManager().getMVWorlds().stream().filter(world -> !world.getName().contains("world") && !world.getName().contains(config.getString("spawn-lobby.world"))).forEach(world -> sb.append(world.getName()).append(", "));
    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.available-maps")));
    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6" + sb));
    return true;

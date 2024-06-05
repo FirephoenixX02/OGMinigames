@@ -20,8 +20,6 @@ public class ForceStart implements CommandExecutor {
 
     public FileConfiguration config = PS3Minigames.INSTANCE.getConfig();
 
-    public PS3Minigames plugin = PS3Minigames.INSTANCE;
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
@@ -33,7 +31,7 @@ public class ForceStart implements CommandExecutor {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.force-starting-game").replace("%map%", world.getName())));
                 return true;
             } else {
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.world-not-found")));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', config.getString("messages.world-not-found").replace("%world%", args[0])));
                 return true;
             }
         }

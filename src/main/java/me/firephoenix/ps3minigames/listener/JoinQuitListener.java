@@ -49,36 +49,38 @@ public class JoinQuitListener implements Listener {
 
         // Send all players in the lobby the join message
         String joinMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.join").replace("%player%", player.getDisplayName()));
-        for (Player player1 : plugin.getLobby().getPlayers()) {
-            player1.sendMessage(joinMessage);
-        }
+
+        plugin.getLobby().getPlayers().forEach(player1 -> player1.sendMessage(joinMessage));
+
         player.sendMessage(joinMessage);
 
-        int lobbySize = plugin.getLobby().getPlayers().size();
+        int playerCount = plugin.getLobby().getPlayers().size();
 
-        if (lobbySize == 0) {
+        if (playerCount < 2) {
             String neededPlayersMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.needed-players"));
+
             player.sendMessage(neededPlayersMessage);
-            for (Player player1 : plugin.getLobby().getPlayers()) {
-                player1.sendMessage(neededPlayersMessage);
-            }
+
+            plugin.getLobby().getPlayers().forEach(player1 -> player1.sendMessage(joinMessage));
         } else {
             String gameStartMessage;
-            int startSeconds = (lobbySize >= 3) ? 10 : 25;
+            int startSeconds = (playerCount >= 3) ? 10 : 25;
             gameStartMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.game-start").replace("%seconds%", Integer.toString(startSeconds)));
 
             player.sendMessage(gameStartMessage);
-            for (Player player1 : plugin.getLobby().getPlayers()) {
-                player1.sendMessage(gameStartMessage);
-            }
+
+            plugin.getLobby().getPlayers().forEach(player1 -> player1.sendMessage(joinMessage));
 
             if (plugin.getLobbyState() == LobbyState.IDLE) {
+
                 plugin.setLobbyState(LobbyState.STARTING);
                 lobbyPlayers.add(player.getUniqueId());
+
                 plugin.getLobby().getPlayers().forEach(player1 -> lobbyPlayers.add(player1.getUniqueId()));
 
-                gameTimer.start();
                 gameTimer = new Timer(startSeconds, plugin);
+
+                gameTimer.start();
                 gameTimer.whenComplete(() -> PS3Minigames.INSTANCE.getGameUtil().startNewGame(lobbyPlayers, plugin.getServer().getWorld("cavern")));
             }
         }
