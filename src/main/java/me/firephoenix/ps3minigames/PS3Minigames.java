@@ -17,11 +17,13 @@ import me.firephoenix.ps3minigames.states.LobbyState;
 import me.firephoenix.ps3minigames.util.GameUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 @Getter
 @Setter
@@ -55,7 +57,24 @@ public final class PS3Minigames extends JavaPlugin {
         // Load Multiverse-API
         multiverseCore = (MultiverseCore) getServer().getPluginManager().getPlugin("Multiverse-Core");
 
-        lobby = Bukkit.getServer().getWorld(getConfig().getString("spawn-lobby.world"));
+        String lobbyWorldName = getConfig().getString("spawn-lobby.world");
+
+        lobby = Bukkit.getServer().getWorld(lobbyWorldName);
+
+        //World doesn't exist but string in config is set, world is probably not loaded.
+        if (lobby == null && getConfig().getString("spawn-lobby.world") != null) {
+            //Try to load the world manually
+            try {
+              new WorldCreator(lobbyWorldName).createWorld();
+            } catch (Exception e) {
+                //World loading didn't work world folder doesn't exist/is corrupt.
+                getLogger().log(Level.SEVERE, "There was an error loading the lobby world! The lobby name could be loaded from config but the world itself could not be found!");
+            }
+            getLogger().log(Level.INFO, "Loaded previously unloaded lobby world!");
+
+            //Now that the world is loaded set global object again
+            lobby = Bukkit.getServer().getWorld(lobbyWorldName);
+        }
 
         //Register Commands
         getCommand("build").setExecutor(new BuildMode());
